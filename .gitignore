@@ -1,0 +1,92 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.project
+.pydevproject
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# PyTorch & Machine Learning Model Checkpoints (Do NOT commit model weights)
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.safetensors
+*.onnx
+*.engine
+weights/
+checkpoints/
+
+# Datasets and Raw Time-Series SCADA Telemetry (Do NOT commit proprietary/benchmark data)
+*.csv
+*.tsv
+*.parquet
+*.h5
+*.hdf5
+*.npy
+*.npz
+*.tar.gz
+*.zip
+*.7z
+data/
+datasets/
+raw_data/
+scada_data/
+
+# Documentation Build Artifacts & LaTeX (Do NOT commit PDF / LaTeX files)
+*.pdf
+*.tex
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini

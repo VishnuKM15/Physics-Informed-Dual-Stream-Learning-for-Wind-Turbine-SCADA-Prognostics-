@@ -1,0 +1,168 @@
+{
+  "ontology_name": "Universal Physical SCADA Ontology",
+  "version": "5.0",
+  "sampling_interval_minutes": 10,
+  "window_length_steps": 36,
+  "window_duration_hours": 6,
+  "total_channels": 12,
+  "core_channels_count": 8,
+  "auxiliary_channels_count": 4,
+  "streams": {
+    "stream_1_aerodynamic_boundary": {
+      "channel_indices": [0, 1, 2, 3, 4, 5],
+      "input_dim": 6,
+      "description": "High-frequency aerodynamic, kinematic, and atmospheric boundary condition measurements"
+    },
+    "stream_2_thermodynamic_auxiliary": {
+      "channel_indices": [6, 7, 8, 9, 10, 11],
+      "input_dim": 6,
+      "description": "High-inertia drivetrain thermal rises and farm-specific auxiliary system availability"
+    }
+  },
+  "channel_specifications": [
+    {
+      "index": 0,
+      "name": "wind_speed_norm",
+      "stream": "aerodynamic",
+      "physical_concept": "Hub-height wind speed",
+      "raw_units": "m/s",
+      "normalization_rule": "v / 12.0",
+      "scaling_constant": 12.0,
+      "physical_basis": "Rated wind speed marking Region II (cubic aerodynamic tracking) to Region III (pitch regulated) transition per IEC 61400-1",
+      "clip_bounds": [0.0, 2.917],
+      "core_feature": true
+    },
+    {
+      "index": 1,
+      "name": "rotor_speed_norm",
+      "stream": "aerodynamic",
+      "physical_concept": "Low-speed shaft rotor rotational speed",
+      "raw_units": "rpm",
+      "normalization_rule": "omega / 16.0",
+      "scaling_constant": 16.0,
+      "physical_basis": "Nominal synchronous rotor speed for multi-megawatt wind turbines",
+      "clip_bounds": [0.0, 1.562],
+      "core_feature": true
+    },
+    {
+      "index": 2,
+      "name": "active_power_norm",
+      "stream": "aerodynamic",
+      "physical_concept": "Active electrical power output",
+      "raw_units": "kW",
+      "normalization_rule": "P / 3000.0",
+      "scaling_constant": 3000.0,
+      "physical_basis": "Rated nameplate capacity ceiling for 2.0-3.0 MW class fleet turbines",
+      "clip_bounds": [0.0, 1.333],
+      "core_feature": true
+    },
+    {
+      "index": 3,
+      "name": "pitch_angle_norm",
+      "stream": "aerodynamic",
+      "physical_concept": "Blade pitch angle",
+      "raw_units": "deg",
+      "normalization_rule": "theta / 30.0",
+      "scaling_constant": 30.0,
+      "physical_basis": "Operating pitch range between fine pitch (0 deg) and feathering (>30 deg)",
+      "clip_bounds": [-0.167, 3.167],
+      "core_feature": true
+    },
+    {
+      "index": 4,
+      "name": "ambient_temp_norm",
+      "stream": "aerodynamic",
+      "physical_concept": "Nacelle / tower ambient air temperature",
+      "raw_units": "deg_C",
+      "normalization_rule": "T_amb / 40.0",
+      "scaling_constant": 40.0,
+      "physical_basis": "Standard maximum ambient operating design boundary",
+      "clip_bounds": [-0.625, 1.250],
+      "core_feature": true
+    },
+    {
+      "index": 5,
+      "name": "power_residual",
+      "stream": "aerodynamic",
+      "physical_concept": "Theoretical aerodynamic power curve residual",
+      "raw_units": "pu",
+      "normalization_rule": "min(1.0, (v/12.0)^3) - (P/3000.0)",
+      "scaling_constant": 1.0,
+      "physical_basis": "First-principles actuator disc aerodynamic reference deviation",
+      "clip_bounds": [-2.0, 2.0],
+      "core_feature": true
+    },
+    {
+      "index": 6,
+      "name": "oil_temp_rise_norm",
+      "stream": "thermodynamic",
+      "physical_concept": "Gearbox oil thermal rise above ambient (T_oil - T_amb)",
+      "raw_units": "deg_C",
+      "normalization_rule": "(T_oil - T_amb) / 60.0",
+      "scaling_constant": 60.0,
+      "physical_basis": "Thermodynamic rise decoupling ambient weather from drivetrain mechanical losses",
+      "clip_bounds": [0.0, 1.333],
+      "core_feature": true
+    },
+    {
+      "index": 7,
+      "name": "bearing_temp_rise_norm",
+      "stream": "thermodynamic",
+      "physical_concept": "Main bearing thermal rise above ambient (T_brg - T_amb)",
+      "raw_units": "deg_C",
+      "normalization_rule": "(T_brg - T_amb) / 60.0",
+      "scaling_constant": 60.0,
+      "physical_basis": "Bearing thermal rise above ambient decoupling seasonal meteorological variance",
+      "clip_bounds": [0.0, 1.333],
+      "core_feature": true
+    },
+    {
+      "index": 8,
+      "name": "stator_current_norm",
+      "stream": "auxiliary",
+      "physical_concept": "Generator stator current magnitude",
+      "raw_units": "A",
+      "normalization_rule": "I / 2500.0",
+      "scaling_constant": 2500.0,
+      "physical_basis": "Rated continuous full-load stator current for 2.0-3.0 MW turbines at 690 V",
+      "clip_bounds": [0.0, 1.400],
+      "core_feature": false
+    },
+    {
+      "index": 9,
+      "name": "stator_current_mask",
+      "stream": "auxiliary",
+      "physical_concept": "Binary availability flag for stator current sensor",
+      "raw_units": "binary",
+      "normalization_rule": "1.0 if sensor present else 0.0",
+      "scaling_constant": 1.0,
+      "physical_basis": "Cross-farm ontology alignment mask indicating telemetry channel presence",
+      "clip_bounds": [0.0, 1.0],
+      "core_feature": false
+    },
+    {
+      "index": 10,
+      "name": "hydraulic_pressure_norm",
+      "stream": "auxiliary",
+      "physical_concept": "Pitch / braking hydraulic system pressure",
+      "raw_units": "bar",
+      "normalization_rule": "p_hyd / 200.0",
+      "scaling_constant": 200.0,
+      "physical_basis": "Nominal hydraulic circuit accumulator relief pressure",
+      "clip_bounds": [0.0, 1.250],
+      "core_feature": false
+    },
+    {
+      "index": 11,
+      "name": "hydraulic_mask",
+      "stream": "auxiliary",
+      "physical_concept": "Binary availability flag for hydraulic pressure sensor",
+      "raw_units": "binary",
+      "normalization_rule": "1.0 if sensor present else 0.0",
+      "scaling_constant": 1.0,
+      "physical_basis": "Cross-farm ontology alignment mask indicating telemetry channel presence",
+      "clip_bounds": [0.0, 1.0],
+      "core_feature": false
+    }
+  ]
+}

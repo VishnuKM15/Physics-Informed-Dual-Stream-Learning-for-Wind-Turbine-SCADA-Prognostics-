@@ -1,0 +1,82 @@
+{
+  "architecture_name": "DualStreamV5",
+  "model_type": "Physics-Informed Dual-Stream Sequence Autoencoder (PINN-AE)",
+  "sequence_length": 36,
+  "sampling_rate_minutes": 10,
+  "effective_temporal_receptive_field_hours": 6.0,
+  "input_total_channels": 12,
+  "stream_1": {
+    "name": "aerodynamic_boundary_encoder",
+    "input_channels": 6,
+    "feature_indices": [0, 1, 2, 3, 4, 5],
+    "layer_type": "Bidirectional LSTM",
+    "hidden_size": 128,
+    "num_layers": 1,
+    "output_dim": 256,
+    "linear_bottleneck": 64
+  },
+  "stream_2": {
+    "name": "thermodynamic_auxiliary_encoder",
+    "input_channels": 6,
+    "feature_indices": [6, 7, 8, 9, 10, 11],
+    "layer_type": "Bidirectional LSTM",
+    "hidden_size": 128,
+    "num_layers": 1,
+    "output_dim": 256,
+    "linear_bottleneck": 64
+  },
+  "latent_fusion": {
+    "layer_type": "Multi-Layer Perceptron (MLP)",
+    "input_dim": 128,
+    "hidden_dim": 256,
+    "output_dim": 128,
+    "activation": "ReLU",
+    "dropout": 0.0
+  },
+  "sequence_decoder": {
+    "layer_type": "Multi-Layer Perceptron (MLP)",
+    "input_dim": 128,
+    "hidden_dims": [256, 512],
+    "output_dim": 432,
+    "output_reshaped": [36, 12],
+    "activation": "ReLU"
+  },
+  "physics_ode_engine": {
+    "governing_ode": "d(Delta_T)/dt = alpha_continuous * P_pu - beta_continuous * Delta_T",
+    "discrete_form": "Delta_T[t+1] = (1 - beta_step) * Delta_T[t] + alpha_step * P_pu[t]",
+    "time_constant_formula": "tau = 10.0 / (beta_step * 60.0) [hours]",
+    "monitored_thermal_channels": {
+      "gearbox_oil": {
+        "channel_index": 6,
+        "alpha_param": "alpha_oil",
+        "beta_param": "beta_oil"
+      },
+      "main_bearing": {
+        "channel_index": 7,
+        "alpha_param": "alpha_brg",
+        "beta_param": "beta_brg"
+      }
+    },
+    "parameter_bounds": {
+      "alpha_formulation": "alpha_step = exp(alpha_param)",
+      "beta_formulation": "beta_step = beta_max * sigmoid(beta_param)",
+      "beta_max": 0.5,
+      "stability_guarantee": "Discrete pole lambda = (1 - beta_step) in (0.5, 1.0) strictly prevents numerical oscillation and guarantees asymptotic decay"
+    }
+  },
+  "loss_weights": {
+    "reconstruction_channel_weights": [1.0, 1.0, 1.0, 1.0, 1.0, 3.0, 3.0, 3.0, 1.0, 2.0, 2.0, 0.0],
+    "physics_loss_weight_lambda": 1.0,
+    "mmd_domain_alignment_weight": 1.0,
+    "mmd_kernel_bandwidths": [1.0, 5.0, 10.0]
+  },
+  "computational_footprint": {
+    "total_trainable_parameters": 763572,
+    "weights_memory_fp32_mib": 2.913,
+    "macs_per_window": 10362880,
+    "mflops_per_window": 20.73,
+    "single_window_cpu_latency_ms": 12.35,
+    "batch_128_cpu_latency_per_window_ms": 1.14,
+    "batch_8192_gpu_latency_per_window_ms": 0.0104
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "dataset_benchmark": "CARE-To-Compare Multi-Farm Benchmark",
+  "domain": "Industrial Wind Turbine SCADA Condition Monitoring",
+  "temporal_resolution": {
+    "sampling_frequency": "10-minute average intervals",
+    "uniform_grid": true,
+    "missing_data_imputation": "Sample-and-hold (forward-fill)"
+  },
+  "turbine_fleet_breakdown": {
+    "farm_a": {
+      "type": "Onshore",
+      "turbines_count": 6,
+      "datasets_count": 12,
+      "nominal_power_kw": 2050,
+      "channels_available": ["wind_speed", "rotor_speed", "power", "pitch", "ambient_temp", "oil_temp", "bearing_temp", "stator_current"]
+    },
+    "farm_b": {
+      "type": "Offshore",
+      "turbines_count": 15,
+      "datasets_count": 25,
+      "nominal_power_kw": 3000,
+      "channels_available": ["wind_speed", "rotor_speed", "power", "pitch", "ambient_temp", "oil_temp", "bearing_temp", "stator_current"]
+    },
+    "farm_c": {
+      "type": "Onshore Target Fleet",
+      "turbines_count": 15,
+      "datasets_count": 58,
+      "normal_episodes": 29,
+      "fault_episodes": 29,
+      "nominal_power_kw": 2000,
+      "channels_available": ["wind_speed", "rotor_speed", "power", "pitch", "ambient_temp", "oil_temp", "bearing_temp", "hydraulic_pressure"]
+    }
+  },
+  "sequence_window_specification": {
+    "window_length": 36,
+    "stride": 1,
+    "window_shape": [36, 12],
+    "batch_layout": "[Batch, Timesteps=36, Channels=12]"
+  },
+  "evaluation_protocols": {
+    "strict_zero_shot": {
+      "train_farms": ["Farm A", "Farm B"],
+      "target_farm": "Farm C",
+      "target_data_access": "None (fully unseen at training)",
+      "target_feature_adaptation": "zeropad8 (auxiliary channels zero-padded)",
+      "threshold_calibration": "Frozen strictly on Source Farms A+B"
+    },
+    "transductive_adaptation": {
+      "train_farms": ["Farm A", "Farm B", "Farm C Normal Telemetry"],
+      "target_fault_labels_access": "Zero (strictly unsupervised on target normal data)",
+      "alignment_loss": "Multi-Kernel Maximum Mean Discrepancy (MMD)",
+      "threshold_calibration": "Frozen on Source Farms A+B under 4h rolling-minimum"
+    }
+  }
+}

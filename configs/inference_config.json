@@ -1,0 +1,38 @@
+{
+  "inference_pipeline": "Pure-Software Modular SCADA Prognostic Engine",
+  "causal_execution": true,
+  "scoring_window": {
+    "timesteps_aggregated": 6,
+    "duration_minutes": 60,
+    "timesteps_indices": [30, 31, 32, 33, 34, 35],
+    "description": "Last-hour window aggregation capturing recent degradation while preserving causality"
+  },
+  "channel_scoring": {
+    "scored_channels": [0, 1, 2, 3, 4, 5, 6, 7],
+    "scored_channels_count": 8,
+    "description": "Core-8 channels only; auxiliary farm-specific channels (8-11) are excluded from scoring"
+  },
+  "standardization": {
+    "method": "Source-Calibrated Median Absolute Deviation (MAD)",
+    "scale_factor": 1.4826,
+    "clipping_bounds": [0.0, 20.0],
+    "reference_data": "Normal healthy operating windows from source wind farms (Farms A and B)"
+  },
+  "temporal_persistence_gate": {
+    "filter_type": "Causal Rolling Minimum (rmin)",
+    "persistence_steps_k": 24,
+    "persistence_duration_hours": 4.0,
+    "unanimity_property": "Threshold exceedance requires continuous anomalous residuals across K=24 consecutive steps (K-of-K unanimous exceedance)",
+    "instant_clearing": "Clears immediately if a single 10-minute step drops below threshold, suppressing transient false alarms"
+  },
+  "alert_thresholds": {
+    "supervisory_warning_threshold": 2.81,
+    "critical_fault_threshold": 4.50,
+    "percentile_calibration": "Derived from source healthy normal distribution under 4-hour persistence (p95 = 2.81, p99 = 4.50)"
+  },
+  "strict_zero_shot_projection": {
+    "projection_type": "zeropad8",
+    "mechanism": "Zero-pad auxiliary channels 8:12 (X[:, :, 8:12] = 0.0) at test time on target turbines lacking auxiliary sensors",
+    "purpose": "Eliminates 540x unpenalized ghost-sensor MSE surge without requiring target retraining"
+  }
+}
